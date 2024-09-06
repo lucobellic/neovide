@@ -5,6 +5,9 @@ pub struct Colors {
     pub foreground: Option<Color4f>,
     pub background: Option<Color4f>,
     pub special: Option<Color4f>,
+    pub fg: Option<u64>,
+    pub bg: Option<u64>,
+    pub sp: Option<u64>,
 }
 
 #[derive(Debug, Clone, Copy, Eq, PartialEq)]
@@ -85,24 +88,24 @@ impl Style {
             .unwrap_or_else(|| self.foreground(default_colors))
     }
 
-    pub fn packed_foreground(&self) -> Option<u64> {
+    pub fn fg(&self) -> Option<u64> {
         if self.reverse {
-            self.colors.packed_background
+            self.colors.bg
         } else {
-            self.colors.packed_foreground
+            self.colors.fg
         }
     }
 
-    pub fn packed_background(&self) -> Option<u64> {
+    pub fn bg(&self) -> Option<u64> {
         if self.reverse {
-            self.colors.packed_foreground
+            self.colors.fg
         } else {
-            self.colors.packed_background
+            self.colors.bg
         }
     }
 
-    pub fn packed_special(&self) -> Option<u64> {
-        self.colors.packed_special
+    pub fn sp(&self) -> Option<u64> {
+        self.colors.sp
     }
 
     pub fn set_background_opacity(&mut self, color_opacity: &ColorOpacity, default_opacity: f32) {
@@ -126,12 +129,18 @@ mod tests {
         foreground: Some(Color4f::new(0.1, 0.1, 0.1, 0.1)),
         background: Some(Color4f::new(0.2, 0.1, 0.1, 0.1)),
         special: Some(Color4f::new(0.3, 0.1, 0.1, 0.1)),
+        fg: None,
+        bg: None,
+        sp: None,
     };
 
     const DEFAULT_COLORS: Colors = Colors {
         foreground: Some(Color4f::new(0.1, 0.2, 0.1, 0.1)),
         background: Some(Color4f::new(0.2, 0.2, 0.1, 0.1)),
         special: Some(Color4f::new(0.3, 0.2, 0.1, 0.1)),
+        fg: None,
+        bg: None,
+        sp: None,
     };
 
     #[test]

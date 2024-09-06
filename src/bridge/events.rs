@@ -521,11 +521,18 @@ fn parse_default_colors(default_colors_arguments: Vec<Value>) -> Result<RedrawEv
     let [foreground, background, special, _term_foreground, _term_background] =
         extract_values(default_colors_arguments)?;
 
+    let fg = parse_u64(foreground)?;
+    let bg = parse_u64(background)?;
+    let sp = parse_u64(special)?;
+
     Ok(RedrawEvent::DefaultColorsSet {
         colors: Colors {
-            foreground: Some(unpack_color(parse_u64(foreground)?)),
-            background: Some(unpack_color(parse_u64(background)?)),
-            special: Some(unpack_color(parse_u64(special)?)),
+            foreground: Some(unpack_color(fg)),
+            background: Some(unpack_color(bg)),
+            special: Some(unpack_color(sp)),
+            fg: Some(fg),
+            bg: Some(bg),
+            sp: Some(sp),
         },
     })
 }
@@ -533,19 +540,25 @@ fn parse_default_colors(default_colors_arguments: Vec<Value>) -> Result<RedrawEv
 fn parse_style(style_map: Value, _info_array: Value) -> Result<Style> {
     let attributes = parse_map(style_map)?;
 
-    let mut style = Style::new(Colors::new(None, None, None));
+    let mut style = Style::new(Colors::new(None, None, None, None, None, None));
 
     for attribute in attributes {
         if let (Value::String(name), value) = attribute {
             match (name.as_str().unwrap(), value) {
-                ("foreground", Value::Integer(packed_color)) => {
-                    style.colors.foreground = Some(unpack_color(packed_color.as_u64().unwrap()))
+                ("foreground", Value::Integer(color)) => {
+                    let color = color.as_u64().unwrap();
+                    style.colors.fg = Some(color);
+                    style.colors.foreground = Some(unpack_color(color));
                 }
-                ("background", Value::Integer(packed_color)) => {
-                    style.colors.background = Some(unpack_color(packed_color.as_u64().unwrap()))
+                ("background", Value::Integer(color)) => {
+                    let color = color.as_u64().unwrap();
+                    style.colors.bg = Some(color);
+                    style.colors.background = Some(unpack_color(color))
                 }
-                ("special", Value::Integer(packed_color)) => {
-                    style.colors.special = Some(unpack_color(packed_color.as_u64().unwrap()))
+                ("special", Value::Integer(color)) => {
+                    let color = color.as_u64().unwrap();
+                    style.colors.sp = Some(color);
+                    style.colors.special = Some(unpack_color(color))
                 }
                 ("reverse", Value::Boolean(reverse)) => style.reverse = reverse,
                 ("italic", Value::Boolean(italic)) => style.italic = italic,
