@@ -38,6 +38,9 @@ impl GridRenderer {
             Some(colors::WHITE),
             Some(colors::BLACK),
             Some(colors::GREY),
+            Some(255255255),
+            Some(000000000),
+            Some(128128128),
         )));
         let em_size = shaper.current_size();
         let font_dimensions = shaper.font_base_dimensions();
