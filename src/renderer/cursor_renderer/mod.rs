@@ -13,7 +13,7 @@ use crate::{
     renderer::{animation_utils::*, GridRenderer, RenderedWindow},
     settings::{ParseFromValue, SETTINGS},
     units::{to_skia_point, GridPos, GridScale, PixelPos, PixelSize, PixelVec},
-    window::ShouldRender,
+    window::{ShouldRender, WindowSettings},
 };
 
 use blink::*;
@@ -284,10 +284,12 @@ impl CursorRenderer {
         if !(self.cursor.enabled && render) {
             return;
         }
+        let transparency = SETTINGS.get::<WindowSettings>().transparency;
+        let default_colors = &grid_renderer.get_default_colors_with_transparency(transparency);
         // Draw Background
         let background_color = self
             .cursor
-            .background(&grid_renderer.default_style.colors)
+            .background(default_colors)
             .to_color()
             .with_a((opacity * alpha) as u8);
         paint.set_color(background_color);
@@ -302,7 +304,7 @@ impl CursorRenderer {
         // Draw foreground
         let foreground_color = self
             .cursor
-            .foreground(&grid_renderer.default_style.colors)
+            .foreground(default_colors)
             .to_color()
             .with_a((opacity * alpha) as u8);
         paint.set_color(foreground_color);

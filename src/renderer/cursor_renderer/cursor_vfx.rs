@@ -4,10 +4,10 @@ use skia_safe::{paint::Style, BlendMode, Canvas, Color, Paint, Rect};
 
 use crate::{
     editor::Cursor,
-    renderer::cursor_renderer::CursorSettings,
-    renderer::{animation_utils::*, grid_renderer::GridRenderer},
+    renderer::{animation_utils::*, cursor_renderer::CursorSettings, grid_renderer::GridRenderer},
     settings::*,
     units::{GridSize, PixelPos, PixelSize, PixelVec},
+    window::WindowSettings,
 };
 
 pub trait CursorVfx {
@@ -142,7 +142,8 @@ impl CursorVfx for PointHighlight {
         let mut paint = Paint::new(skia_safe::colors::WHITE, None);
         paint.set_blend_mode(BlendMode::SrcOver);
 
-        let colors = &grid_renderer.default_style.colors;
+        let transparency = SETTINGS.get::<WindowSettings>().transparency;
+        let colors = &grid_renderer.get_default_colors_with_transparency(transparency);
         let base_color: Color = cursor.background(colors).to_color();
         let alpha = ease(ease_in_quad, settings.vfx_opacity, 0.0, self.t) as u8;
         let color = Color::from_argb(alpha, base_color.r(), base_color.g(), base_color.b());
@@ -344,7 +345,8 @@ impl CursorVfx for ParticleTrail {
             _ => {}
         }
 
-        let colors = &grid_renderer.default_style.colors;
+        let transparency = SETTINGS.get::<WindowSettings>().transparency;
+        let colors = &grid_renderer.get_default_colors_with_transparency(transparency);
         let base_color: Color = cursor.background(colors).to_color();
 
         paint.set_blend_mode(BlendMode::SrcOver);

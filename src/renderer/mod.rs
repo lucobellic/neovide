@@ -204,7 +204,11 @@ impl Renderer {
 
     pub fn draw_frame(&mut self, root_canvas: &Canvas, dt: f32) {
         tracy_zone!("renderer_draw_frame");
-        let default_background = self.grid_renderer.get_default_background().to_color();
+        let transparency = SETTINGS.get::<WindowSettings>().transparency;
+        let default_background = self
+            .grid_renderer
+            .get_default_background(transparency)
+            .to_color();
         let grid_scale = self.grid_renderer.grid_scale;
 
         let layer_grouping = SETTINGS
@@ -442,7 +446,7 @@ impl Renderer {
                 result.font_changed = true;
             }
             DrawCommand::DefaultStyleChanged(new_style) => {
-                self.grid_renderer.default_style = Arc::new(new_style);
+                self.grid_renderer.set_default_style(Arc::new(new_style));
             }
             DrawCommand::ModeChanged(new_mode) => {
                 self.current_mode = new_mode;

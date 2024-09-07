@@ -11,16 +11,17 @@ use crate::{
     units::{
         to_skia_point, to_skia_rect, GridPos, GridScale, GridSize, PixelPos, PixelRect, PixelVec,
     },
+    window::WindowSettings,
 };
 
 use super::fonts::font_options::FontOptions;
 
 pub struct GridRenderer {
     pub shaper: CachingShaper,
-    pub default_style: Arc<Style>,
     pub em_size: f32,
     pub grid_scale: GridScale,
     pub is_ready: bool,
+    default_style: Arc<Style>,
 }
 
 /// Struct with named fields to be returned from draw_background
@@ -38,9 +39,9 @@ impl GridRenderer {
             Some(colors::WHITE),
             Some(colors::BLACK),
             Some(colors::GREY),
-            Some(255255255),
-            Some(000000000),
-            Some(128128128),
+            Some(16777215),
+            Some(0),
+            Some(8947848),
         )));
         let em_size = shaper.current_size();
         let font_dimensions = shaper.font_base_dimensions();
@@ -52,6 +53,10 @@ impl GridRenderer {
             grid_scale: GridScale::new(font_dimensions),
             is_ready: false,
         }
+    }
+
+    pub fn set_default_style(&mut self, style: Arc<Style>) {
+        self.default_style = style;
     }
 
     pub fn font_names(&self) -> Vec<String> {
@@ -91,8 +96,28 @@ impl GridRenderer {
         PixelRect::from_origin_and_size(pos, size)
     }
 
-    pub fn get_default_background(&self) -> Color4f {
-        self.default_style.colors.background.unwrap()
+    pub fn get_default_colors_with_transparency(&self, transparency: f32) -> Colors {
+        let colors = (*self.default_style).clone().colors;
+
+        let background = &mut colors.background.unwrap();
+        if let Some(opacity_setting) = &self.default_style.opacity_settings.background {
+            background.a = opacity_setting.compute_opacity(transparency);
+        }
+
+        let foreground = &mut colors.foreground.unwrap();
+        if let Some(opacity_setting) = &self.default_style.opacity_settings.foreground {
+            foreground.a = opacity_setting.compute_opacity(transparency);
+        }
+
+        colors
+    }
+
+    pub fn get_default_background(&self, transparency: f32) -> Color4f {
+        let mut background = self.default_style.colors.background.unwrap();
+        if let Some(opacity_setting) = &self.default_style.opacity_settings.background {
+            background.a = opacity_setting.compute_opacity(transparency);
+        }
+        background
     }
 
     /// Draws a single background cell with the same style
@@ -112,9 +137,10 @@ impl GridRenderer {
             };
         }
 
+        let transparency = SETTINGS.get::<WindowSettings>().transparency;
         let region = self.compute_text_region(grid_position, cell_width);
         let style = style.as_ref().unwrap_or(&self.default_style);
-        let style_background = style.background(&self.default_style.colors);
+        let style_background = style.background(&self.default_style.colors, transparency);
 
         let mut paint = Paint::default();
         paint.set_anti_alias(false);
@@ -128,7 +154,8 @@ impl GridRenderer {
             paint.set_color(style_background.to_color());
         }
 
-        let custom_color = style_background != self.get_default_background();
+        let custom_color =
+            style_background.to_opaque() != self.get_default_background(transparency).to_opaque();
         if custom_color {
             canvas.draw_rect(to_skia_rect(&region), &paint);
         }
@@ -184,7 +211,12 @@ impl GridRenderer {
             let random_color = random_hsv.to_color(255);
             paint.set_color(random_color);
         } else {
-            paint.set_color(style.foreground(&self.default_style.colors).to_color());
+            let transparency = SETTINGS.get::<WindowSettings>().transparency;
+            paint.set_color(
+                style
+                    .foreground(&self.default_style.colors, transparency)
+                    .to_color(),
+            );
         }
         paint.set_anti_alias(false);
 
@@ -213,7 +245,7 @@ impl GridRenderer {
 
         if style.strikethrough {
             let line_position = region.center().y;
-            paint.set_color(style.special(&self.default_style.colors).to_color());
+            paint.set_color(style.special(&self.default_style.colors, 1.0).to_color());
             canvas.draw_line(
                 (pos.x, line_position),
                 (pos.x + width, line_position),
@@ -250,8 +282,13 @@ impl GridRenderer {
         let p1 = (p1.x.round(), (p1.y + stroke_width / 2.).round());
         let p2 = (p2.x.round(), (p2.y + stroke_width / 2.).round());
 
+        let transparency = SETTINGS.get::<WindowSettings>().transparency;
         underline_paint
-            .set_color(style.special(&self.default_style.colors).to_color())
+            .set_color(
+                style
+                    .special(&self.default_style.colors, transparency)
+                    .to_color(),
+            )
             .set_stroke_width(stroke_width);
 
         match underline_style {
