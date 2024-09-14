@@ -15,7 +15,11 @@ use std::{
 };
 use winit::event_loop::EventLoopProxy;
 
-use crate::{bridge::NeovimWriter, window::UserEvent};
+use crate::{
+    bridge::{NeovimWriter, RedrawEvent},
+    window::UserEvent,
+    LoggingSender,
+};
 pub use from_value::ParseFromValue;
 pub use window_size::{
     clamped_grid_size, load_last_window_settings, save_window_size, PersistentWindowSettings,
@@ -145,6 +149,7 @@ impl Settings {
         &self,
         arguments: Vec<Value>,
         event_loop_proxy: &EventLoopProxy<UserEvent>,
+        redraw_event_sender: &LoggingSender<RedrawEvent>,
     ) {
         let mut arguments = arguments.into_iter();
         let (name, value) = (arguments.next().unwrap(), arguments.next().unwrap());
@@ -155,8 +160,19 @@ impl Settings {
         let event = self
             .updaters
             .read()
-            .get(&SettingLocation::NeovideGlobal(name))
+            .get(&SettingLocation::NeovideGlobal(name.clone()))
             .unwrap()(self, value);
+
+        // Handle special case for transparency to update the style's opacity
+        if name == "transparency" {
+            if let SettingsChanged::Window(crate::window::WindowSettingsChanged::Transparency(
+                opacity,
+            )) = event
+            {
+                let _ = redraw_event_sender.send(RedrawEvent::OpacityChanged { opacity });
+            }
+        }
+
         let _ = event_loop_proxy.send_event(event.into());
     }
 

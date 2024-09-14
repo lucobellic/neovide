@@ -96,8 +96,11 @@ impl Handler for NeovimHandler {
                 }
             }
             "setting_changed" => {
-                SETTINGS
-                    .handle_setting_changed_notification(arguments, &self.proxy.lock().unwrap());
+                SETTINGS.handle_setting_changed_notification(
+                    arguments,
+                    &self.proxy.lock().unwrap(),
+                    &self.sender,
+                );
             }
             "option_changed" => {
                 SETTINGS.handle_option_changed_notification(arguments, &self.proxy.lock().unwrap());

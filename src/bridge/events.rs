@@ -197,6 +197,9 @@ pub enum RedrawEvent {
         color: u64,
         color_opacity: ColorOpacity,
     },
+    OpacityChanged {
+        opacity: f32,
+    },
     GridLine {
         grid: u64,
         row: u64,

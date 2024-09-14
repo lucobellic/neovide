@@ -236,6 +236,15 @@ impl Editor {
                     }
                 }
             }
+            RedrawEvent::OpacityChanged { opacity } => {
+                self.style_registry.update_all_styles_opacity(opacity);
+                if let Some(default_style) = self.style_registry.default_style() {
+                    self.draw_command_batcher
+                        .queue(DrawCommand::DefaultStyleChanged(default_style));
+                    self.redraw_screen();
+                    self.draw_command_batcher.send_batch(&self.event_loop_proxy);
+                }
+            }
             RedrawEvent::CursorGoto {
                 grid,
                 column: left,
