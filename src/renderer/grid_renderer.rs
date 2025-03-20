@@ -130,6 +130,7 @@ impl GridRenderer {
         cells: &Range<u32>,
         style: &Option<Arc<Style>>,
         opacity: f32,
+        is_floating_window: bool,
     ) -> BackgroundInfo {
         tracy_zone!("draw_background");
         let debug = self.settings.get::<RendererSettings>().debug_renderer;
@@ -166,6 +167,10 @@ impl GridRenderer {
             opacity
         };
         paint.set_alpha_f(alpha);
+
+        if is_floating_window && is_default_background {
+            paint.set_alpha_f(0.0);
+        }
 
         let custom_color = paint.color4f() != self.default_style.colors.background.unwrap();
         if custom_color {

@@ -613,7 +613,13 @@ impl RenderedWindow {
         to_skia_rect(&adjusted_region)
     }
 
-    pub fn prepare_lines(&mut self, grid_renderer: &mut GridRenderer, opacity: f32, force: bool) {
+    pub fn prepare_lines(
+        &mut self,
+        grid_renderer: &mut GridRenderer,
+        opacity: f32,
+        force: bool,
+        is_floating_window: bool,
+    ) {
         let scroll_offset_lines = self.scroll_animation.position.floor() as isize;
         let height = self.grid_size.height as isize;
         if height == 0 {
@@ -645,7 +651,7 @@ impl RenderedWindow {
 
             for line_fragment in line.line.fragments() {
                 let LineFragment { cells, style, .. } = line_fragment;
-                let background_info = grid_renderer.draw_background(canvas, cells, style, opacity);
+                let background_info = grid_renderer.draw_background(canvas, cells, style, opacity, is_floating_window);
                 custom_background |= background_info.custom_color;
                 has_transparency |= background_info.transparent;
             }

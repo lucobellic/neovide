@@ -432,9 +432,14 @@ impl Renderer {
 
     pub fn prepare_lines(&mut self, force: bool) {
         let opacity = self.settings.get::<WindowSettings>().opacity;
-        self.rendered_windows
-            .iter_mut()
-            .for_each(|(_, w)| w.prepare_lines(&mut self.grid_renderer, opacity, force));
+        self.rendered_windows.iter_mut().for_each(|(_, w)| {
+            w.prepare_lines(
+                &mut self.grid_renderer,
+                opacity,
+                force,
+                w.anchor_info.is_some(),
+            )
+        });
     }
 
     fn handle_draw_command(&mut self, draw_command: DrawCommand, result: &mut DrawCommandResult) {
