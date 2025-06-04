@@ -1,0 +1,380 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js ayu">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Config File - Neovide</title>
+        <!-- Custom HTML head -->
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="A Simple, No Nonsense, Cross-Platform, Graphical User Interface for Neovim">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="theme/pagetoc.css">
+        <link rel="stylesheet" href="theme/custom.css">
+        <link rel="stylesheet" href="theme/breakpoints.css">
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "ayu" : "ayu";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('ayu')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="index.html">Neovide</a></li><li class="spacer"></li><li class="chapter-item expanded "><a href="features.html"><strong aria-hidden="true">1.</strong> Features</a></li><li class="chapter-item expanded "><a href="installation.html"><strong aria-hidden="true">2.</strong> Installation</a></li><li class="chapter-item expanded "><a href="configuration.html"><strong aria-hidden="true">3.</strong> Configuration</a></li><li class="chapter-item expanded "><a href="commands.html"><strong aria-hidden="true">4.</strong> Commands</a></li><li class="chapter-item expanded "><a href="command-line-reference.html"><strong aria-hidden="true">5.</strong> Command Line Reference</a></li><li class="chapter-item expanded "><a href="config-file.html" class="active"><strong aria-hidden="true">6.</strong> Config File</a></li><li class="chapter-item expanded "><a href="api.html"><strong aria-hidden="true">7.</strong> API</a></li><li class="chapter-item expanded "><a href="integration-with-external-tools.html"><strong aria-hidden="true">8.</strong> Integration w/ External Tools</a></li><li class="chapter-item expanded "><a href="troubleshooting.html"><strong aria-hidden="true">9.</strong> Troubleshooting</a></li><li class="chapter-item expanded "><a href="faq.html"><strong aria-hidden="true">10.</strong> FAQ</a></li><li class="chapter-item expanded "><a href="maintainer-cookbook.html"><strong aria-hidden="true">11.</strong> Maintainer Cookbook</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu (default)</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Neovide</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/neovide/neovide" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                        <a href="https://github.com/neovide/neovide/edit/main/website/docs/config-file.md" title="Suggest an edit" aria-label="Suggest an edit">
+                            <i id="git-edit-button" class="fa fa-edit"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main><div class="sidetoc"><nav class="pagetoc"></nav></div>
+                        <h1 id="config-file"><a class="header" href="#config-file">Config File</a></h1>
+<p><strong>Available since 0.11.0.</strong></p>
+<p>Neovide also support configuration through a config file in <a href="https://toml.io">the toml format</a>.</p>
+<h2 id="settings-priority"><a class="header" href="#settings-priority">Settings priority</a></h2>
+<p>There are two types of settings:</p>
+<ol>
+<li>Settings override these settings from the environment variables, but they can be overridden
+by command line arguments.</li>
+<li>Runtime settings. These settings can be hot-reloaded in runtime.</li>
+</ol>
+<h2 id="location"><a class="header" href="#location">Location</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Platform</th><th>Location</th><th>Example</th></tr></thead><tbody>
+<tr><td>Linux</td><td><code>$XDG_CONFIG_HOME/neovide/config.toml</code> or <code>$HOME/.config/neovide/config.toml</code></td><td><code>/home/alice/.config/neovide/config.toml</code></td></tr>
+<tr><td>macOS</td><td><code>$XDG_CONFIG_HOME/neovide/config.toml</code> or <code>$HOME/.config/neovide/config.toml</code></td><td><code>/Users/Alice/Library/Application Support/neovide/config.toml</code></td></tr>
+<tr><td>Windows</td><td><code>{FOLDERID_RoamingAppData}/neovide/config.toml</code></td><td><code>C:\Users\Alice\AppData\Roaming/neovide/config.toml</code></td></tr>
+</tbody></table>
+</div>
+<p>You may use a different location by modifying the <code>$NEOVIDE_CONFIG</code> environment variable to be
+a full path to a <code>config.toml</code> file (doesn't explicitly have to be called <code>config.toml</code>
+however.)</p>
+<h2 id="available-settings"><a class="header" href="#available-settings">Available settings</a></h2>
+<p>Settings currently available in the config file with default values:</p>
+<pre><code class="language-toml">backtraces_path = &quot;/path/to/neovide_backtraces.log&quot; # see below for the default platform specific location
+fork = false
+frame = &quot;full&quot;
+idle = true
+maximized = false
+mouse-cursor-icon = &quot;arrow&quot;
+neovim-bin = &quot;/usr/bin/nvim&quot; # in reality found dynamically on $PATH if unset
+no-multigrid = false
+srgb = false
+tabs = true
+theme = &quot;auto&quot;
+title-hidden = true
+vsync = true
+wsl = false
+
+[font]
+normal = [] # Will use the bundled Fira Code Nerd Font by default
+size = 14.0
+
+[box-drawing]
+# &quot;font-glyph&quot;, &quot;native&quot; or &quot;selected-native&quot;
+mode = &quot;font-glyph&quot;
+
+[box-drawing.sizes]
+default = [2, 4]  # Thin and thick values respectively, for all sizes
+</code></pre>
+<p>Refer to <a href="command-line-reference.html">Command Line Reference</a> for details about the config settings
+listed above.</p>
+<h3 id="runtime-settings"><a class="header" href="#runtime-settings">Runtime settings</a></h3>
+<h4 id="font"><a class="header" href="#font"><code>Font</code></a></h4>
+<p><strong>Available since 0.12.1.</strong></p>
+<p><code>[font]</code> table in configuration file contains:</p>
+<ul>
+<li><code>normal</code>: required, <code>FontDescription</code></li>
+<li><code>bold</code>: optional, <code>SecondaryFontDescription</code></li>
+<li><code>italic</code>: optional, <code>SecondaryFontDescription</code></li>
+<li><code>bold_italic</code>: optional, <code>SecondaryFontDescription</code></li>
+<li><code>features</code>: optional, <code>{ &quot;&lt;font&gt;&quot; = [&quot;&lt;string&gt;&quot;] }</code></li>
+<li><code>size</code>: required,</li>
+<li><code>width</code>: optional,</li>
+<li><code>hinting</code>: optional,</li>
+<li><code>edging</code>: optional,</li>
+</ul>
+<p>Settings <code>size</code>, <code>width</code>, <code>hinting</code> and <code>edging</code> can be found in
+<a href="configuration.html">Configuration</a>.</p>
+<ul>
+<li><code>FontDescription</code> can be:
+<ul>
+<li>a table with two keys <code>family</code> and <code>style</code>, <code>family</code> is required, <code>style</code> is optional,</li>
+<li>a string, indicate the font family,</li>
+<li>an array of string or tables in previous two forms.</li>
+</ul>
+</li>
+<li><code>SecondaryFontDescription</code> can be:
+<ul>
+<li>a table with two keys <code>family</code> and <code>style</code>, both are optional,</li>
+<li>a string, indicate the font family,</li>
+<li>an array of string or tables in previous two forms.</li>
+</ul>
+</li>
+<li>Font styles consist of zero or more space separated parts, each parts can be:
+<ul>
+<li>pre-defined style name
+<ul>
+<li>weight: <code>Thin</code>, <code>ExtraLight</code>, <code>Light</code>, <code>Normal</code>, <code>Medium</code>, <code>SemiBold</code>, <code>Bold</code>,
+<code>ExtraBold</code>, <code>Black</code>, <code>ExtraBlack</code></li>
+<li>slant: <code>Italic</code>, <code>Oblique</code></li>
+</ul>
+</li>
+<li>variable font weight: <code>W&lt;weight&gt;</code>, e.g. <code>W100</code>, <code>W200</code>, <code>W300</code>, <code>W400</code>, <code>W500</code>, <code>W600</code>,
+<code>W700</code>, <code>W800</code>, <code>W900</code></li>
+</ul>
+</li>
+<li>Font features are a table with font family as key and an array of string as value, each
+string is a font feature.
+<ul>
+<li>Font feature is a string with format <code>+&lt;feature&gt;</code>, <code>-&lt;feature&gt;</code> or <code>&lt;feature&gt;=&lt;value&gt;</code>,
+e.g. <code>+ss01</code>, <code>-calt</code>, <code>ss02=2</code>. <code>+&lt;feature&gt;</code> is a shorthand for <code>&lt;feature&gt;=1</code>,
+<code>-&lt;feature&gt;</code> is a shorthand for <code>&lt;feature&gt;=0</code>.</li>
+</ul>
+</li>
+</ul>
+<p>Example:</p>
+<pre><code class="language-toml">[font]
+normal = [&quot;MonoLisa Nerd Font&quot;]
+size = 18
+
+[font.features]
+&quot;MonoLisa Nerd Font&quot; = [ &quot;+ss01&quot;, &quot;+ss07&quot;, &quot;+ss11&quot;, &quot;-calt&quot;, &quot;+ss09&quot;, &quot;+ss02&quot;, &quot;+ss14&quot; ]
+</code></pre>
+<p>Specify font weight:</p>
+<pre><code class="language-toml">[font]
+size = 19
+hinting = &quot;full&quot;
+edging = &quot;antialias&quot;
+
+[[font.normal]]
+family = &quot;JetBrainsMono Nerd Font Propo&quot;
+style = &quot;W400&quot;
+
+# You can set a different font for fallback
+[[font.normal]]
+family = &quot;Noto Sans CJK SC&quot;
+style = &quot;Normal&quot;
+
+[[font.bold]]
+family = &quot;JetBrainsMono Nerd Font Propo&quot;
+style = &quot;W600&quot;
+
+# No need to specify fallback in every variant, if omitted or specified here
+# but not found, it will fallback to normal font with this weight which is bold
+# in this case.
+[[font.bold]]
+family = &quot;Noto Sans CJK SC&quot;
+style = &quot;Bold&quot;
+</code></pre>
+<h4 id="box-drawing"><a class="header" href="#box-drawing">Box Drawing</a></h4>
+<p>The Unicode standard defines several code points that are useful to draw <a href="https://en.wikipedia.org/wiki/Box_Drawing">boxes, diagrams or are
+otherwise decorations</a>. A font file can include graphical
+representation for several of these code points (glyphs). For example, <a href="https://www.nerdfonts.com/">Nerd
+Fonts</a> is a collection of font faces that have been patched to include
+glyphs for several box drawing code points (and many other use-cases).</p>
+<p>When Neovide renders these glyphs, some glyphs might not line up correctly or might have gaps
+between adjacent cells, breaking visual continuity. This is especially pronounced when using the
+<a href="./configuration.html#line-spacing">linespace</a> configuration option to add spacing between lines.</p>
+<p>Neovide has support for native rendering (i.e ignore the glyph data in the font) for a subset of
+these glyphs to avoid this problem. You can configure this via:</p>
+<pre><code class="language-toml">[box-drawing]
+# &quot;font-glyph&quot;, &quot;native&quot; or &quot;selected-native&quot;
+mode = &quot;native&quot;
+# selected = &quot;🮐🮑🮒&quot;
+</code></pre>
+<ul>
+<li><code>font-glyph</code> uses the glyph data in the font file.</li>
+<li><code>native</code> (default) turns on native rendering for all supported box drawing glyphs.</li>
+<li><code>selected-native</code> turns on native rendering for only code points specified in the <code>selected</code>
+setting.</li>
+</ul>
+<p>The width of the lines drawn can be further controlled using the following settings:</p>
+<pre><code class="language-toml">[box-drawing.sizes]
+default = [1, 3]  # Thin and thick values respectively, below 12px
+12 = [1, 2]       # 12px to 13.9999px
+14 = [2, 4]
+18 = [3, 6]
+</code></pre>
+<p>The <code>sizes</code> settings maps font sizes the thickness (in pixels) for thin and thick lines
+respectively. For example, if you are using a font with size 15px and with the above settings,
+Neovide to draw thin lines with width 2px and thick lines with width 4px. These settings only needs
+changing if you find that at certain font sizes the box characters seem too thick or too thin to
+your liking. Only <code>default</code> is required and overrides for specific sizes is optional.</p>
+<p><strong>NOTE:</strong> The sizes are specified in pixels unlike font size, which is specified in points. The
+reason for that, is to give a more controllable configuration when you are using different DPI
+settings. To convert from pt to pixels you can use the following formula <code>pt_size * (96/72) * scale</code>, so if you are using a 10.5 pt size font with a scale factor of 1.5, then it will become
+<code>10.5 pt * (96/72) * 1.5 = 21 px</code>. You also have to add the <code>linespace</code> setting if you use that.</p>
+<p>The default is 2 pixels for thin and 4 pixels for thick lines regardless of the font size, which
+corresponds to the settings below.</p>
+<pre><code class="language-toml">[box-drawing.sizes]
+default = [2, 4]  # Thin and thick values respectively, for all sizes
+</code></pre>
+<h4 id="backtraces_path"><a class="header" href="#backtraces_path">backtraces_path</a></h4>
+<p><strong>Available since 0.14.0.</strong></p>
+<p>If Neovide crashes, it will write a file named <code>neovide_backtraces.log</code> into
+this location, with more information about the crash. This can alternatively be
+configured through the environment variable <code>NEOVIDE_BACKTRACES</code>, which is
+useful if the crash happens before the config file is read for example.</p>
+<p>The default location is the following:</p>
+<div class="table-wrapper"><table><thead><tr><th>Platform</th><th>Location</th><th>Example</th></tr></thead><tbody>
+<tr><td>Linux</td><td><code>$XDG_DATA_HOME or $HOME/.local/share/neovide</code></td><td><code>/home/alice/.local/share/neovide</code></td></tr>
+<tr><td>macOS</td><td><code>$HOME/Library/Application Support/neovide</code></td><td><code>/Users/Alice/Library/Application Support/neovide</code></td></tr>
+<tr><td>Windows</td><td><code>{FOLDERID_LocalAppData}\neovide</code></td><td><code>C:\Users\Alice\AppData\Local\neovide</code></td></tr>
+</tbody></table>
+</div>
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="command-line-reference.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                            <a rel="next" href="api.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="command-line-reference.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                    <a rel="next" href="api.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        <script type="text/javascript" src="theme/pagetoc.js"></script>
+        <script type="text/javascript" src="theme/custom.js"></script>
+    </body>
+</html>
