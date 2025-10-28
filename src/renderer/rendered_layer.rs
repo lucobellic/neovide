@@ -71,7 +71,11 @@ impl FloatingLayer<'_> {
 
         let paint = Paint::default()
             .set_anti_alias(false)
-            .set_blend_mode(BlendMode::SrcOver)
+            .set_blend_mode(if settings.floating_xray {
+                BlendMode::Src
+            } else {
+                BlendMode::SrcOver
+            })
             .to_owned();
 
         let save_layer_rec = SaveLayerRec::default().bounds(&bound_rect).paint(&paint);

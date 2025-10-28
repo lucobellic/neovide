@@ -104,6 +104,7 @@ pub struct RendererSettings {
     text_gamma: f32,
     text_contrast: f32,
     experimental_layer_grouping: bool,
+    pub floating_xray: bool,
 }
 
 impl Default for RendererSettings {
@@ -126,6 +127,7 @@ impl Default for RendererSettings {
             text_gamma: 0.0,
             text_contrast: 0.5,
             experimental_layer_grouping: false,
+            floating_xray: false,
         }
     }
 }

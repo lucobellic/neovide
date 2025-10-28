@@ -316,6 +316,24 @@ vim.g.neovide_floating_corner_radius = 0.0
 Setting `g:neovide_floating_corner_radius` to 0.0 will disable the corner radius. The value of
 floating_corner_radius ranges from 0.0 to 1.0, representing a percentage of the line height.
 
+#### Floating X-Ray
+
+VimScript:
+
+```vim
+let g:neovide_floating_xray = v:false
+```
+
+Lua:
+
+```lua
+vim.g.neovide_floating_xray = false
+```
+
+Setting `g:neovide_floating_xray` to `true` will prevent floating windows with default backgrounds
+from becoming transparent. This is useful when you want floating windows to fully obscure the content
+behind them rather than blending with it.
+
 #### Transparency
 
 VimScript:

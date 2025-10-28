@@ -168,7 +168,8 @@ impl GridRenderer {
         };
         paint.set_alpha_f(alpha);
 
-        if is_floating_window && is_default_background {
+        let renderer_settings = self.settings.get::<RendererSettings>();
+        if is_floating_window && is_default_background && !renderer_settings.floating_xray {
             paint.set_alpha_f(0.0);
         }
 
