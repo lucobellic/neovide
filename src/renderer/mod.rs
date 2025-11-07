@@ -117,6 +117,7 @@ pub struct RendererSettings {
     text_contrast: f32,
     experimental_layer_grouping: bool,
     pixel_geometry: PixelGeometry,
+    floating_xray: bool,
 }
 
 impl Default for RendererSettings {
@@ -140,6 +141,7 @@ impl Default for RendererSettings {
             text_contrast: 0.5,
             experimental_layer_grouping: false,
             pixel_geometry: PixelGeometry::default(),
+            floating_xray: false,
         }
     }
 }
