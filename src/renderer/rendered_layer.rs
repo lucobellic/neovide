@@ -91,8 +91,8 @@ impl FloatingLayer<'_> {
             root_canvas.restore();
         }
 
-        let paint =
-            Paint::default().set_anti_alias(false).set_blend_mode(BlendMode::SrcOver).to_owned();
+        let blend_mode = if settings.floating_xray { BlendMode::Src } else { BlendMode::SrcOver };
+        let paint = Paint::default().set_anti_alias(false).set_blend_mode(blend_mode).to_owned();
 
         let save_layer_rec = SaveLayerRec::default().bounds(&draw_bound_rect).paint(&paint);
 
