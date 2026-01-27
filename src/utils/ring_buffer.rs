@@ -86,7 +86,10 @@ impl<T: Clone> RingBuffer<T> {
 
     fn get_array_index(&self, index: isize) -> usize {
         let num = self.elements.len() as isize;
-        (self.current_index + index).rem_euclid(num) as usize
+        match num {
+            0 => 0,
+            _ => (self.current_index + index).rem_euclid(num) as usize,
+        }
     }
 
     fn get_bounds<R: RangeBounds<isize>>(&self, range: R) -> Range<isize> {

@@ -624,7 +624,9 @@ impl RenderedWindow {
                     self.actual_lines.len() as isize..self.actual_lines.len() as isize + far_lines
                 };
                 for i in empty_lines {
-                    self.scrollback_lines[i] = None;
+                    if i >= 0 && i < self.scrollback_lines.len() as isize {
+                        self.scrollback_lines[i] = None;
+                    }
                 }
             // And even when scrolling in steps, we can't let it drift too far, since the
             // buffer size is limited
