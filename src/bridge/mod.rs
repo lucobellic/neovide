@@ -224,7 +224,7 @@ async fn create_neovim_session(
     settings.read_initial_values(&session.neovim).await?;
     set_background_if_allowed(background, &session.neovim).await;
 
-    let capture_startup_messages = supports_startup_message_capture(&api_information.version);
+    let capture_startup_messages = false;
     if capture_startup_messages {
         let pre_attach_cmdheight = session
             .neovim
