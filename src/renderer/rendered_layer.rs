@@ -67,7 +67,7 @@ impl FloatingLayer<'_> {
 
         let (silhouette, bound_rect) = build_silhouette(&pixel_regions, settings, grid_scale);
         let (draw_clip, draw_bound_rect) =
-            self.build_draw_clip_and_bounds(silhouette.clone(), bound_rect, &regions, grid_scale);
+            self.build_draw_clip_and_bounds(silhouette.clone(), bound_rect, &pixel_regions, grid_scale);
         let has_transparency = self.windows.iter().any(|window| window.has_transparency());
 
         self._draw_shadow(root_canvas, &silhouette, settings);
@@ -107,13 +107,13 @@ impl FloatingLayer<'_> {
             window.draw_foreground_surface(root_canvas, pixel_regions[i], grid_scale);
             ret.push(WindowDrawDetails {
                 id: window.id,
-                region: regions[i],
+                region: pixel_regions[i],
                 grid_size: window.grid_size,
                 window_type: window.window_type,
             });
         });
 
-        for (window, region) in self.windows.iter().zip(regions.iter().copied()) {
+        for (window, region) in self.windows.iter().zip(pixel_regions.iter().copied()) {
             window.draw_trailing_background_surface(root_canvas, region, grid_scale);
         }
 
