@@ -424,23 +424,23 @@ impl RenderedWindow {
         root_canvas.clip_rect(pixel_region, None, Some(false));
         root_canvas.clear(default_background);
 
-        self.draw_background_surface(root_canvas, draw_region_box, grid_scale);
-        self.draw_foreground_surface(root_canvas, draw_region_box, grid_scale);
+        self.draw_background_surface(root_canvas, pixel_region_box, grid_scale);
+        self.draw_foreground_surface(root_canvas, pixel_region_box, grid_scale);
 
         root_canvas.restore();
 
-        let window_region_box = self.expanded_bottom_pixel_region(
+        let _window_region_box = self.expanded_bottom_pixel_region(
             draw_region_box,
             content_region,
             grid_scale,
             bottommost_window,
         );
 
-        self.draw_edge_background_surface(root_canvas, window_region_box, grid_scale);
+        // self.draw_edge_background_surface(root_canvas, _window_region_box, grid_scale);
 
         WindowDrawDetails {
             id: self.id,
-            region: window_region_box,
+            region: pixel_region_box,
             grid_size: self.grid_size,
             window_type: self.window_type,
         }
