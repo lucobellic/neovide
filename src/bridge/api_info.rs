@@ -304,7 +304,8 @@ fn parse_parameter_type(
 
 fn parse_parameter(value: ValueRef) -> std::result::Result<ApiParameter, ApiInfoParseError> {
     let info: Vec<ValueRef> = value.try_into()?;
-    if let Some((t, n)) = info.into_iter().collect_tuple() {
+    let mut iter = info.into_iter();
+    if let (Some(t), Some(n)) = (iter.next(), iter.next()) {
         let name: Utf8StringRef = n.try_into()?;
         let name = name.as_str();
         let parameter_type = parse_parameter_type(t)?;
