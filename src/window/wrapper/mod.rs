@@ -137,6 +137,16 @@ impl WindowPadding {
             size.height.saturating_sub(self.top).saturating_sub(self.bottom),
         )
     }
+
+    fn center_vertically(mut self, size: PixelSize<u32>, row_height: f32) -> Self {
+        let height = self.content_size(size).height;
+        let rows = round_or_op(height as f32 / row_height, f32::floor);
+        let grid_height = round_or_op(rows * row_height, f32::ceil) as u32;
+        let remaining = height.saturating_sub(grid_height);
+        self.top += remaining / 2;
+        self.bottom += remaining - remaining / 2;
+        self
+    }
 }
 
 #[derive(PartialEq, PartialOrd)]
@@ -1884,6 +1894,15 @@ impl WinitWindowWrapper {
         }
     }
 
+    fn calculate_grid_padding(&self, window_id: WindowId) -> WindowPadding {
+        let padding = self.calculate_window_padding(window_id);
+        let Some(route) = self.routes.get(&window_id) else {
+            return padding;
+        };
+        let row_height = route.window.renderer.borrow().grid_renderer.grid_scale.height();
+        padding.center_vertically(self.content_pixel_size_from_window(window_id), row_height)
+    }
+
     pub fn get_focused_route(&self) -> Option<WindowId> {
         if let Some(id) = self.routes.iter().find_map(|(key, val)| {
             if (!val.window.winit_window.has_focus() && self.routes.len() == 1)
@@ -1977,7 +1996,7 @@ impl WinitWindowWrapper {
 
         let mut should_render = ShouldRender::Wait;
 
-        let window_padding = self.calculate_window_padding(window_id);
+        let window_padding = self.calculate_grid_padding(window_id);
         let padding_changed = self
             .routes
             .get(&window_id)
@@ -2228,6 +2247,11 @@ impl WinitWindowWrapper {
         PixelSize::new(route.state.saved_inner_size.width, route.state.saved_inner_size.height)
     }
     fn update_grid_size_from_window(&mut self, window_id: WindowId) {
+        let window_padding = self.calculate_grid_padding(window_id);
+        if let Some(route) = self.routes.get_mut(&window_id) {
+            route.state.window_padding = window_padding;
+        }
+
         let (grid_scale, neovim_handler, last_synced, saved_inner_size) =
             match self.routes.get(&window_id) {
                 Some(route) => {
@@ -2323,5 +2347,38 @@ impl WinitWindowWrapper {
         }
         renderer.handle_os_scale_factor_change(scale_factor);
         skia_renderer.resize();
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn vertical_padding_preserves_rows_and_configured_padding() {
+        let padding = WindowPadding { top: 3, bottom: 5, left: 2, right: 4 };
+        assert_eq!(
+            padding.center_vertically(PixelSize::new(200, 105), 20.0),
+            WindowPadding { top: 11, bottom: 14, left: 2, right: 4 }
+        );
+        for row_height in [20.0, 20.25, 20.333334] {
+            for height in 100..200 {
+                let size = PixelSize::new(200, height);
+                let centered = padding.center_vertically(size, row_height);
+                let original_rows =
+                    round_or_op(padding.content_size(size).height as f32 / row_height, f32::floor);
+                let centered_rows =
+                    round_or_op(centered.content_size(size).height as f32 / row_height, f32::floor);
+
+                assert_eq!(original_rows, centered_rows);
+                assert!(centered.top >= padding.top);
+                assert!(centered.bottom >= padding.bottom);
+                assert!(
+                    (centered.top - padding.top).abs_diff(centered.bottom - padding.bottom) <= 1
+                );
+                assert_eq!(centered.left, padding.left);
+                assert_eq!(centered.right, padding.right);
+            }
+        }
     }
 }
